@@ -4,6 +4,10 @@ const app = express();
 
 const path = require('path')
 const bodyParser = require('body-parser');
+let jwt = require('jsonwebtoken');
+let token;
+let jtwPassword;
+let jtwEmail;
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -14,7 +18,29 @@ app.use(express.static(staticPath));
 app.post('/signup', (req, res) => {
     const username = req.body.username;
     const userEmail = req.body.email;
-    res.send('Username received: ' + username + " " +' and the email is '+userEmail);
+    const password = req.body.password
+
+    jtwPassword = password
+    jtwEmail = userEmail
+    token = jwt.sign({ email: userEmail }, password);
+
+
+
+    res.send('Username received: ' + username + " " +' and the email is '+userEmail + " " + token);
+});
+
+app.post('/login', (req, res) => {
+    const userEmail = req.body.loginemail;
+    const password = req.body.password;
+    if(userEmail == jtwEmail && jtwPassword == password){
+        let decoded = jwt.verify(token, password);
+        res.send(decoded.email + " you are varified")
+
+    }else{
+
+        res.status(403).json({msg:"email or password invalid"});
+    }
+   
 });
 app.get('/',(req,res)=>{
 
