@@ -42,16 +42,21 @@ app.post('/signup', async function (req, res){
     res.send('Username received: ' + username + " " +' and the email is '+userEmail + " " + token);
 });
 
-app.post('/login',(req, res) => {
+app.post('/login', async (req, res) => {
     const userEmail = req.body.loginemail;
     const password = req.body.password;
-
     
+    const existingUser = await fbUsers.findOne({email:userEmail})
 
+    // let username = existingUser.name
+    
+    
+    if(existingUser){
+        let storedPassword = existingUser.password
+        let uniqueId = existingUser.uniqueId
+        let decoded = jwt.verify(uniqueId, storedPassword);
 
-    if(userEmail == jtwEmail && jtwPassword == password){
-        let decoded = jwt.verify(token, password);
-        res.send(decoded.email + " you are varified")
+        res.send(existingUser.name + " you are varified")
 
     }else{
 
